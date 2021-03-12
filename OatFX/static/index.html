@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>OatFX</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static '/assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Euphoria+Script">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Waiting+for+the+Sunrise">
+    <link rel="stylesheet" href="{% static '/assets/css/styles.min.css' %}">
+</head>
+
+<body style="padding-top: 80px;">
+    <div>
+        <nav class="navbar navbar-light navbar-expand-md fixed-top navigation-clean-button custom-navigation-gradient" style="color: rgb(251,249,249);height: 80px;">
+            <div class="container"><a class="navbar-brand" href="#" style="font-size: 30px;font-family: 'Euphoria Script', cursive;">OatFX</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+                <div
+                    class="collapse navbar-collapse" id="navcol-1">
+                    <ul class="nav navbar-nav mr-auto">
+                        <li class="nav-item" role="presentation"><a class="nav-link active" href="#" style="color: rgb(255,255,255);">Data</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" style="color: rgb(255,255,255);">Open Order</a></li>
+                        <li class="dropdown nav-item"><a class="dropdown-toggle nav-link invisible" data-toggle="dropdown" aria-expanded="false" href="#">Dropdown </a>
+                            <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation" href="#">First Item</a><a class="dropdown-item" role="presentation" href="#">Second Item</a><a class="dropdown-item" role="presentation" href="#">Third Item</a></div>
+                        </li>
+                    </ul><span class="navbar-text actions"> <a class="btn btn-light action-button" role="button" href="#">Log In</a></span></div>
+    </div>
+    </nav>
+    </div>
+    <section style="position: relative;">
+        <div class="container">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead style="font-size: 10px;height: 20px;">
+                        <tr>
+                            <th>Account</th>
+                            <th>Equity</th>
+                            <th>Gross P/L</th>
+                            <th>Day P/L</th>
+                            <th>Used Margin</th>
+                            <th>Usable Margin</th>
+                            <th>Usable Margin, %</th>
+                            <th>Used Maint Margin</th>
+                            <th><strong>Usable Maint Margin</strong><br></th>
+                            <th><strong>Usable Maint Margin, %</strong><br></th>
+                            <th>MC</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 13px;">
+                        <tr>
+                            <td>Cell 1</td>
+                            <td>Cell 2</td>
+                            <td>Cell 3</td>
+                            <td>Cell 4</td>
+                            <td>Cell 5</td>
+                            <td>Cell 6</td>
+                            <td>Cell 7</td>
+                            <td>Cell 8</td>
+                            <td>Cell 9</td>
+                            <td>Cell 10</td>
+                            <td>Cell 11</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% load static %}
+    <script src="{% static 'assets/js/jquery.min.js' %}" ></script>
+    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}" ></script>
+    <script src="{% static 'assets/js/script.min.js' %}" ></script>
+</body>
+
+</html>
