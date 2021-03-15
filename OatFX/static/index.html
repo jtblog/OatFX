@@ -5,26 +5,31 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>OatFX</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static '/assets/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Euphoria+Script">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Waiting+for+the+Sunrise">
-    <link rel="stylesheet" href="{% static '/assets/css/styles.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/fonts/ionicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}">
 </head>
 
-<body style="padding-top: 80px;">
+<body style="padding-top: 100px;">
     <div>
-        <nav class="navbar navbar-light navbar-expand-md fixed-top navigation-clean-button custom-navigation-gradient" style="color: rgb(251,249,249);height: 80px;">
+        <nav class="navbar navbar-light navbar-expand-md fixed-top navigation-clean-button custom-navigation-gradient" style="height: 80px;">
             <div class="container"><a class="navbar-brand" href="#" style="font-size: 30px;font-family: 'Euphoria Script', cursive;">OatFX</a><button class="navbar-toggler" data-toggle="collapse" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
                 <div
                     class="collapse navbar-collapse" id="navcol-1">
                     <ul class="nav navbar-nav mr-auto">
-                        <li class="nav-item" role="presentation"><a class="nav-link active" href="#" style="color: rgb(255,255,255);">Data</a></li>
-                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" style="color: rgb(255,255,255);">Open Order</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link active" href="#" data-bs-hover-animate="swing" style="color: #2d3d31;">Data</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" data-bs-hover-animate="wobble" style="color: #2d3d31;">Open positions</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" data-bs-hover-animate="tada" style="color: #2d3d31;">Summary</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" data-bs-hover-animate="swing" style="color: rgb(45,61,49);">Closed positions</a></li>
+                        <li class="nav-item" role="presentation"><a class="nav-link" href="#" data-bs-hover-animate="tada" style="color: #2d3d31;">Orders</a></li>
                         <li class="dropdown nav-item"><a class="dropdown-toggle nav-link invisible" data-toggle="dropdown" aria-expanded="false" href="#">Dropdown </a>
                             <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation" href="#">First Item</a><a class="dropdown-item" role="presentation" href="#">Second Item</a><a class="dropdown-item" role="presentation" href="#">Third Item</a></div>
                         </li>
-                    </ul><span class="navbar-text actions"> <a class="btn btn-light action-button" role="button" href="#">Log In</a></span></div>
+                    </ul><span class="navbar-text actions"> <a class="btn btn-light action-button" role="button" href="javascript:open_login_modal()" id="login_btn" style="background-color: #2d3d31;">{{ btnhtml }}</a></span></div>
     </div>
     </nav>
     </div>
@@ -44,7 +49,7 @@
                             <th>Used Maint Margin</th>
                             <th><strong>Usable Maint Margin</strong><br></th>
                             <th><strong>Usable Maint Margin, %</strong><br></th>
-                            <th>MC</th>
+                            <th>Margin Call</th>
                         </tr>
                     </thead>
                     <tbody style="font-size: 13px;">
@@ -66,6 +71,42 @@
             </div>
         </div>
     </section>
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6"></div>
+                <div class="col-md-6"></div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-dark" style="padding-top: 25px;">
+        <footer>
+            <div class="container">
+                <div class="row d-xl-flex align-content-center justify-content-xl-center align-items-xl-center" style="margin-right: 0px;margin-left: 0px;">
+                    <div class="col-md-6 item text" style="margin-bottom: 0px;">
+                        <h3>OatFX</h3>
+                        <p>By Obagbemisoye Temitope Joseph. A simple forex trader</p>
+                    </div>
+                    <div class="col text-right d-flex d-sm-flex d-lg-flex d-xl-flex justify-content-center justify-content-sm-center align-items-sm-center justify-content-lg-end align-items-lg-center justify-content-xl-end align-items-xl-center item social"><a href="#"><i class="icon ion-social-facebook"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-snapchat"></i></a><a href="#"><i class="icon ion-social-instagram"></i></a></div>
+                </div>
+                <p id="copyright" class="copyright">A trademark of Oatgroup © 2017</p>
+            </div>
+        </footer>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="login_form_modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #ffffff;">
+                    <h4 class="modal-title">Login</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div>
+                <div class="modal-body" style="background-color: #2d3d31;">
+                    <form method="post">{% csrf_token %}<select class="form-control" style="background-color: #2d3d31;color: rgb(255,255,255);border-top: none;"><option value="demo" selected="">demo</option><option value="real">real</option></select><label for="api_token" style="color: rgb(255,255,255);">Token</label>
+                        <input {% if form.api_token.value != None %}value="{{form.api_token.value |stringformat:'s'}}"{% endif %}
+                            class="form-control" type="text" name="api_token" required="" placeholder="Input FXCM token here" autocomplete="on" style="background-color: transparent;color: rgb(255,255,255);border-top: none;">
+                            <hr><button class="btn btn-link btn-sm float-right" type="submit" style="color: rgb(255,255,255);">Connect</button></form>
+                </div>
+            </div>
+        </div>
+    </div>
     {% load static %}
     <script src="{% static 'assets/js/jquery.min.js' %}" ></script>
     <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}" ></script>

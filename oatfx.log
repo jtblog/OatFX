@@ -1,0 +1,138 @@
+|ERROR|2021-03-13 23:45:32,203|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 26, in post
+    shobj = shobj(con)
+UnboundLocalError: local variable 'shobj' referenced before assignment
+|INFO|2021-03-13 23:50:22,365|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:15:50,353|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 39, in post
+    return render(request, 'index.html', context)
+UnboundLocalError: local variable 'context' referenced before assignment
+|INFO|2021-03-14 00:21:46,566|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:22:57,952|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 40, in post
+    return render(request, 'index.html', context)
+UnboundLocalError: local variable 'context' referenced before assignment
+|ERROR|2021-03-14 00:23:30,872|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 40, in post
+    return render(request, 'index.html', context)
+UnboundLocalError: local variable 'context' referenced before assignment
+|INFO|2021-03-14 00:26:17,332|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:27:24,191|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 40, in post
+    return render(request, 'index.html', context)
+UnboundLocalError: local variable 'context' referenced before assignment
+|INFO|2021-03-14 00:30:27,604|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|WARNING|2021-03-14 00:35:30,719|Not Found: /form
+|INFO|2021-03-14 00:36:11,830|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|WARNING|2021-03-14 00:38:29,216|Not Found: /livereload.js
+|INFO|2021-03-14 00:49:51,783|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:51:43,615|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 33, in post
+    return redirect(reverse(''))
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\urls\base.py", line 87, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\urls\resolvers.py", line 685, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for '' not found. '' is not a valid view function or pattern name.
+|INFO|2021-03-14 00:54:54,234|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:56:05,641|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 33, in post
+    return HttpResponseRedirect('/')
+NameError: name 'HttpResponseRedirect' is not defined
+|INFO|2021-03-14 00:56:38,019|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|ERROR|2021-03-14 00:59:53,365|Server reports an error: {'executed': False, 'error': 'Unauthorized'}.
+|ERROR|2021-03-14 00:59:53,366|URL: https://api-demo.fxcm.com:443/trading/get_model?models=ClosedPosition
+|ERROR|2021-03-14 00:59:53,367|Headers: {'User-Agent': 'request', 'Accept-Encoding': 'gzip, deflate', 'Accept': 'application/json', 'Connection': 'keep-alive', 'Authorization': 'Bearer T7F1pyQT4so_utJ-ABYb428f4f0130d439c3d02922e4a5d4640a783830fb', 'Content-Type': 'application/x-www-form-urlencoded'}
+|ERROR|2021-03-14 00:59:53,368|Params: {'models': ['ClosedPosition']}
+|ERROR|2021-03-14 00:59:53,371|Bearer token: None
+|ERROR|2021-03-14 00:59:53,372|Connection status: unset
+|ERROR|2021-03-14 00:59:53,372|Socket session id: T7F1pyQT4so_utJ-ABYb
+|ERROR|2021-03-14 00:59:53,372|Can not parse server answer to json object: {"response":{"executed":false,"error":"Unauthorized"}}.
+|ERROR|2021-03-14 00:59:54,027|Internal Server Error: /
+Traceback (most recent call last):
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "C:\ProgramData\Anaconda3\lib\site-packages\django\views\generic\base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py", line 29, in post
+    con = fx(access_token=token, log_level='error', server='demo', log_file='oatfx.log')
+  File "C:\ProgramData\Anaconda3\lib\site-packages\fxcmpy\fxcmpy.py", line 227, in __init__
+    self.__collect_positions__()
+  File "C:\ProgramData\Anaconda3\lib\site-packages\fxcmpy\fxcmpy.py", line 2299, in __collect_positions__
+    data = self.get_closed_positions('list')
+  File "C:\ProgramData\Anaconda3\lib\site-packages\fxcmpy\fxcmpy.py", line 393, in get_closed_positions
+    closed_pos = data['closed_positions']
+KeyError: 'closed_positions'
+|WARNING|2021-03-14 01:01:05,786|Not Found: /livereload.js
+|INFO|2021-03-14 01:02:02,716|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|WARNING|2021-03-14 01:16:23,778|Not Found: /livereload.js
+|INFO|2021-03-14 14:45:03,114|C:\Users\Administrator\Documents\Github\OatFX\OatFX\views.py changed, reloading.
+|WARNING|2021-03-14 14:51:02,666|Not Found: /livereload.js
+|INFO|2021-03-14 15:11:29,384|C:\Users\Administrator\Documents\Github\OatFX\OatFX\ListField.py changed, reloading.
