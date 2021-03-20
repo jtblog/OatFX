@@ -3,46 +3,45 @@ from django.shortcuts import render
 from django.views.generic import View
 
 from .forms import LoginForm
-from .shared import *
+from .shared import obj
 
 con = obj.get_connection()
 
 class IndexView(View):
+    
     def post(self, request):
         form = LoginForm(request.POST)
+        con = obj.get_connection()
+        context = { 'btnhtml': 'Log In', 'form': form }
         if(form.is_valid()):
             #TOKEN = '428f4f0130d439c3d02922e4a5d4640a783830fb'
             token = request.POST.get('api_token')
-            con = obj.get_connection()
-            if(con is not None and con.is_connected):
+            if(con is not None):
+                context['btnhtml'] = 'Log Out'
+                context['time'] = obj.minutely_task
+                #obj.get_instruments()
                 pass
             else:
-                con = fx(access_token=token, log_level='error', server='demo', log_file='oatfx.log')
+                con = obj.fx(access_token=token, log_level='error', server='demo', log_file='oatfx.log')
                 obj.set_connection(con)
-                obj.print_account()
-                obj.close()
-            context = {
-                'btnhtml': 'Log Out',
-                'form': form
-            }
+                if(con is not None):
+                    context['btnhtml'] = 'Log Out'
+                    context['time'] = obj.minutely_task
+                
             #return HttpResponseRedirect('/')
             return render(request, 'index.html', context)
         else:
-            '''form = LoginForm()
-            context = {
-                'form':form
-            }
-            return render(request, 'index.html', context)'''
+            pass
     def get(self, request):
         form = LoginForm()
-        context = {
-                'btnhtml': 'Log In',
-                'form':form
-            }
+        context = { 'btnhtml': 'Log In', 'form':form }
+        context['time'] = obj.minutely_task
         return render(request, 'index.html', context)
         
 def close_connection(request):
-    if(con is not None and con.is_connected):
+    con = obj.get_connection()
+    obj.cleardb()
+    if(con is not None):
         con.close()
         return HttpResponse("Connection is closed")
     else:
@@ -58,14 +57,6 @@ def close_connection(request):
         return render(request, 'index.html', {'form':form})
 '''
 
-
-'''
-{% load static %}
-    <link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/fonts/ionicons.min.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/styles.min.css' %}">
-'''
-
 '''
 {{ btnhtml }}
 {% if disabled == True %} disabled {% endif %}
@@ -74,11 +65,4 @@ def close_connection(request):
 '''
 {% csrf_token %}
 {% if form.api_token.value != None %}value="{{form.api_token.value |stringformat:'s'}}"{% endif %}
-'''
-
-'''
-{% load static %}
-    <script src="{% static 'assets/js/jquery.min.js' %}" ></script>
-    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}" ></script>
-    <script src="{% static 'assets/js/script.min.js' %}" ></script>
 '''
