@@ -18,15 +18,16 @@ class IndexView(View):
             token = request.POST.get('api_token')
             if(con is not None):
                 context['btnhtml'] = 'Log Out'
-                context['time'] = obj.minutely_task
+                #json_data = json.dumps({'ping':'1'})
+                #con.send(json_data)
                 #obj.get_instruments()
                 pass
             else:
-                con = obj.fx(access_token=token, log_level='error', server='demo', log_file='oatfx.log')
-                obj.set_connection(con)
+                #con = obj.fx(access_token=token, log_level='error', server='demo', log_file='oatfx.log')
+                obj.connect()
+                #obj.set_connection(con)
                 if(con is not None):
                     context['btnhtml'] = 'Log Out'
-                    context['time'] = obj.minutely_task
                 
             #return HttpResponseRedirect('/')
             return render(request, 'index.html', context)
@@ -35,17 +36,21 @@ class IndexView(View):
     def get(self, request):
         form = LoginForm()
         context = { 'btnhtml': 'Log In', 'form':form }
-        context['time'] = obj.minutely_task
         return render(request, 'index.html', context)
         
 def close_connection(request):
     con = obj.get_connection()
-    obj.cleardb()
-    if(con is not None):
+    #obj.cleardb()
+    '''if(con is not None):
         con.close()
         return HttpResponse("Connection is closed")
     else:
-        return HttpResponseBadRequest('This connection is already closed or bad')
+        return HttpResponseBadRequest("This connection is already closed or bad")'''
+
+
+
+
+
 
 '''def index(request):
     if(request.method) == 'POST':

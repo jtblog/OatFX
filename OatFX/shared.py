@@ -4,9 +4,12 @@ import fxcmpy
 import pandas
 from datetime import datetime, timedelta
 #from collections import deque
-import schedule
+#import schedule
 import time
-from background_task import background
+#from background_task import background
+import websocket
+import json
+
 
 from trader.models import pair
 
@@ -18,23 +21,35 @@ class SharedObjects:
     prices = pandas.DataFrame()
     instruments = ['EUR/USD', 'USD/JPY', 'GBP/USD', 'USD/CHF', 'USD/CAD', 'AUD/USD', 'NZD/USD']
 
-    class fx(fxcmpy.fxcmpy):
-        pass
+    def on_open(ws):
+        json_data = json.dumps({'ticks':'R_100'})
+        ws.send(json_data)
+
+    def on_message(ws, message):
+        print('ticks update: %s' % message)
+
+    '''class fx(fxcmpy.fxcmpy):
+        pass'''
 
     def __init__(self, fx=None):
         self.con = fx
+        pass
 
-    @background(schedule=60)
+    def connect(self):
+        apiUrl = "wss://ws.binaryws.com/websockets/v3?app_id=15805"
+        self.fx = websocket.WebSocketApp(apiUrl, on_message = self.on_message, on_open = self.on_open)
+        self.con = self.fx
+        self.fx.run_forever()
+
+    '''@background(schedule=60)
     def test():
         print(pandas.Timestamp.now())
-        #self.test()
+        #self.test()'''
 
 
     def set_connection(self, fx):
         self.prices = pandas.DataFrame()
         self.con = fx
-        #self.test()
-        print(pandas.Timestamp.now())
         '''schedule.every(1).minutes.do(self.minutely_task)
         while True:
             schedule.run_pending()
@@ -42,13 +57,16 @@ class SharedObjects:
         #self.get_instruments()
 
     def get_connection(self):
+        return self.con
+
+    '''def get_connection(self):
         try:
             if self.con.is_connected():
                 return self.con
             else:
                 return None
         except AttributeError:
-            return None
+            return None'''
 
     def get_instruments(self):
         '''self.instruments = self.con.get_instruments()
@@ -159,7 +177,9 @@ class SharedObjects:
         return False
 
     def close(self):
-        self.con.close()
+        #self.con.close()
+        self.ws.send(json.dumps({'forget_all': 'ticks'}))
+        self.ws.send(json.dumps({'logout': 1}))
     pass
 
 obj = SharedObjects(None)
