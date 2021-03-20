@@ -1,0 +1,205 @@
+library(websocket)
+library(lubridate)
+
+ws <- WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = TRUE)
+
+dt = {} 
+
+ws$onOpen(
+  function(event){
+    cat("Connected")
+    ws$send('{"ticks":"R_100"}')
+  }
+)
+
+ws$onMessage(
+  function(event) {
+    dt <<- event$data
+    cat(dt, "\n")
+    }
+  )
+
+# Forex Major Pairs
+# AUD/JPY
+# AUD/USD
+# EUR/AUD
+# EUR/CAD
+# EUR/CHF
+# EUR/GBP
+# EUR/JPY
+# EUR/USD
+# GBP/AUD
+# GBP/JPY
+# GBP/USD
+# USD/CAD
+# USD/CHF
+# USD/JPY
+
+# Volatility Index
+# Volatility 10 Index
+# Volatility 25 Index
+# Volatility 50 Index
+# Volatility 75 Index
+# Volatility 100 Index
+
+# Tick history and subscription
+# {
+#   "ticks_history": "R_50",
+#   "adjust_start_time": 1,
+#   "count": 5,
+#   "end": "latest",
+#   "start": 5000,
+#   "style": "candles",
+#   "granularity": 60,
+#   "subscribe": 1
+# }
+
+# Tick history response
+# Response
+res0 = '{
+  "candles": [
+    {
+      "close": 132.1521,
+      "epoch": 1616261460,
+      "high": 132.2527,
+      "low": 132.1521,
+      "open": 132.1856
+    },
+    {
+      "close": 132.1076,
+      "epoch": 1616261520,
+      "high": 132.2089,
+      "low": 132.0826,
+      "open": 132.177
+    },
+    {
+      "close": 132.0855,
+      "epoch": 1616261580,
+      "high": 132.1781,
+      "low": 132.0681,
+      "open": 132.0974
+    },
+    {
+      "close": 132.0876,
+      "epoch": 1616261640,
+      "high": 132.0894,
+      "low": 131.9912,
+      "open": 132.0864
+    },
+    {
+      "close": 132.0909,
+      "epoch": 1616261700,
+      "high": 132.1589,
+      "low": 132.0825,
+      "open": 132.1052
+    }
+  ],
+  "echo_req": {
+    "adjust_start_time": 1,
+    "count": 5,
+    "end": "latest",
+    "granularity": 60,
+    "start": 5000,
+    "style": "candles",
+    "ticks_history": "R_50"
+  },
+  "msg_type": "candles",
+  "pip_size": 4
+}'
+
+# Tick stream response
+res1 <- '{
+  "echo_req": {
+    "subscribe": 1,
+    "ticks": "R_50"
+  },
+  "msg_type": "tick",
+  "subscription": {
+    "id": "d949b0c2-2445-e1f3-eba9-44dffc13a0da"
+  },
+  "tick": {
+    "ask": 132.2574,
+    "bid": 132.2374,
+    "epoch": 1616262478,
+    "id": "d949b0c2-2445-e1f3-eba9-44dffc13a0da",
+    "pip_size": 4,
+    "quote": 132.2474,
+    "symbol": "R_50"
+  }
+}'
+
+# Forget all ticks response
+{
+  "echo_req": {
+    "forget_all": "ticks"
+  },
+  "forget_all": [
+    "d949b0c2-2445-e1f3-eba9-44dffc13a0da"
+  ],
+  "msg_type": "forget_all"
+}
+
+# Authorize
+# {
+#   "authorize": "1aStI5HCcty55Ly"
+# }
+
+#Authorize response
+# {
+#   "authorize": {
+#     "account_list": [
+#       {
+#         "currency": "USD",
+#         "is_disabled": 0,
+#         "is_virtual": 0,
+#         "landing_company_name": "svg",
+#         "loginid": "CR508314"
+#       },
+#       {
+#         "currency": "USD",
+#         "is_disabled": 0,
+#         "is_virtual": 1,
+#         "landing_company_name": "virtual",
+#         "loginid": "VRTC1521900"
+#       }
+#     ],
+#     "balance": 23584.69,
+#     "country": "ng",
+#     "currency": "USD",
+#     "email": "jtob91@yahoo.com",
+#     "fullname": "  ",
+#     "is_virtual": 1,
+#     "landing_company_fullname": "Deriv Limited",
+#     "landing_company_name": "virtual",
+#     "local_currencies": {
+#       "NGN": {
+#         "fractional_digits": 2
+#       }
+#     },
+#     "loginid": "VRTC1521900",
+#     "scopes": [
+#       "read",
+#       "trade",
+#       "payments",
+#       "admin"
+#     ],
+#     "upgradeable_landing_companies": [
+#       
+#     ],
+#     "user_id": 5632887
+#   },
+#   "echo_req": {
+#     "authorize": "<not shown>"
+#   },
+#   "msg_type": "authorize"
+# }
+
+#ws$connect()
+
+ws$send('{"forget_all":"ticks"}')
+
+#library(jsonlite)
+#dt = jsonlite::fromJSON(dt)
+
+#lubridate::as_datetime(1616259596)
+#lubridate::now("UTC")
