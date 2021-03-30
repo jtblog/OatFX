@@ -1,0 +1,451 @@
+library(websocket)
+library(lubridate)
+library(jsonlite)
+library(tseries)
+library(stringr)
+library(here)
+library(tseries)
+library(reshape2)
+library(ggplot2)
+library(plotly)
+library(RColorBrewer)
+library(rqdatatable)
+library(tcltk2)
+library(later)
+# source("~/Github/OatFX/OatFX/rscript/model.R")
+source(here::here('OatFX/rscript','model.R'))
+
+msg = NULL 
+datasz = 1000
+pair_list = list()
+tradable_list = list()
+prices = data.frame()
+corhm = NULL
+cointhm = NULL
+err=""
+
+ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
+
+forex_major_pairs = c("frxAUDJPY", "frxAUDUSD",
+                       "frxEURAUD", "frxEURCAD", "frxEURCHF",
+                       "frxEURGBP", "frxEURJPY", "frxEURUSD",
+                       'frxGBPAUD', "frxGBPJPY", "frxGBPUSD",
+                       "frxUSDCAD", "frxUSDCHF", "frxUSDJPY")
+
+volatility_pairs = c("R_10", "R_25", 
+                       "R_50", "R_75", "R_100")
+
+# Get lower triangle of the correlation matrix
+get_lower_tri=function(cormat){
+  cormat[upper.tri(cormat)] = NA
+  return(cormat)
+}
+# Get upper triangle of the correlation matrix
+get_upper_tri = function(cormat){
+  cormat[lower.tri(cormat)]= NA
+  return(cormat)
+}
+
+reorder_cormat = function(cormat){
+  # Use correlation between variables as distance
+  dd = as.dist((1-cormat)/2)
+  hc = hclust(dd)
+  cormat =cormat[hc$order, hc$order]
+}
+
+minutely_task = function(prices){
+  cormat <<- round(cor(prices),2)
+  cointmat <<- as.matrix(round(coint(prices),4))
+  # cormat = reorder_cormat(cormat)
+  upper_tri = get_upper_tri(cormat)
+  upper_tri2 = get_upper_tri(cointmat)
+  lower_tri = get_lower_tri(cormat)
+  lower_tri2 = get_lower_tri(cointmat)
+  # Melt the correlation matrix
+  melted_cormat = melt(upper_tri, na.rm = TRUE)
+  melted_cointmat = melt(lower_tri2, na.rm = TRUE)
+
+  colr = colorRamp(c("blue", "red", "blue"))
+  # colr2 = colorRamp(c("blue", "red", "blue"))
+  
+  corhm <<- plot_ly(z = lower_tri,
+                    zmin=-1,
+                    zmax=1,
+                    x = colnames(data.frame(upper_tri)),
+                    xgap = 0.6,
+                    y = rownames(data.frame(upper_tri)),
+                    ygap = 0.6,
+                    colors = colr,
+                    # colorscale=colorScale ,
+                    type = "heatmap",
+                    colorbar=list(title = "Pearson\nCorrelation")
+            ) %>%
+    add_annotations(x = melted_cormat$Var1,
+                    y = melted_cormat$Var2,
+                    text = melted_cormat$value, 
+                    showarrow = F,
+                    font=list(color='black'))
+  
+  cointhm <<- plot_ly(z = upper_tri2,
+                    zmin=0.000,
+                    zmax=1.000,
+                    x = colnames(data.frame(lower_tri2)),
+                    # xgap = 0.6,
+                    y = rownames(data.frame(lower_tri2)),
+                    # ygap = 0.6,
+                    colors = colr,
+                    showscale=T ,
+                    type = "heatmap",
+                    colorbar=list(title = "ADF\nP-Values")
+            ) %>%
+    add_annotations(x = melted_cointmat$Var1,
+                    y = melted_cointmat$Var2,
+                    text = melted_cointmat$value,
+                    showarrow = F,
+                    font=list(color='black'))
+  
+}
+
+coint = function(vars) {
+  d=as.matrix(vars) #convert data frame to Matrix
+  n=length(colnames(vars)) #calculate the total number of variables
+  m=combn(n,2) #calculate all possible combinations of pairs for all variables
+  col_m=dim(m)[2] #number of all possible combinations
+  result=matrix(NA,nrow=col_m,ncol=3) #empty result matrix
+  colnames(result)=c("Var1","Var2","value")
+  for (i in 1:col_m){
+    Var_1=m[1,i] 
+    Var_2=m[2,i]
+    res = lm(d[,Var_1] ~ d[,Var_2] + 0)$residuals 
+    p = suppressWarnings(tseries::adf.test(res, alternative = "stationary", k = 0)$p.value)
+    result[i,1]=colnames(vars)[Var_1]
+    result[i,2]=colnames(vars)[Var_2]
+    result[i,3]=round(p,4)
+    
+    # Aggregate pairs for pair trading
+    sym1 = colnames(vars)[Var_1]
+    sym2 = colnames(vars)[Var_2]
+    id = paste(sym1, paste('-', sym2, sep=""), sep = "")
+    id = str_replace_all(id, "[\r\n\t]", "")
+    id = str_replace_all(id, " ", "")
+    if(p < 0.05){
+      cordf = as.data.frame(cormat)
+      dt = data.frame(`res` = as.numeric(res))
+      corr = as.numeric(cordf[sym1, sym2])
+      i_dt = NULL
+      tryCatch({
+        i_dt = data.table::copy(tradable_list[[id]]$data)
+      })
+      if(corr > 0.5){
+        # Pair is positively correlated
+        if(is.null(i_dt)){
+            tradable_list[[id]] <<-
+              Combination$new(symbol1 = sym1,
+                              symbol2 = sym2,
+                              data = dt, positively_correlated=T,
+                              adf_p = p)
+        }else{
+          tradable_list[[id]]$set_data(dt)
+        }
+      }else if(corr < -0.5){
+        # Pair is negatively correlated
+        if(is.null(i_dt)){
+          tradable_list[[id]] <<-
+            Combination$new(symbol1 = sym1,
+                            symbol2 = sym2,
+                            data = dt, positively_correlated=F,
+                            adf_p = p)
+        }else{
+          tradable_list[[id]]$set_data(dt)
+        }
+      }
+    }
+    
+  }
+  tmpdt = data.frame(result)
+  for(name in colnames(vars)){
+    tmpdt[nrow(tmpdt)+1,] = list("Var1" = name,"Var2" = name,"value" = 0.01)
+  }
+  result = data.frame("Var1" = as.factor(tmpdt[,"Var1"]), 
+                       "Var2" = as.factor(tmpdt[,"Var2"]), 
+                       "value" = as.numeric(tmpdt[,"value"]))
+  m = dcast(result, Var1 ~ Var2)
+  row.names(m) = as.vector(m[,"Var1"])
+  m[,"Var1"] = NULL
+  n = as.data.frame(t(m)) 
+  m$ID = as.vector(rownames(m))
+  n$ID = as.vector(rownames(n))
+  final = natural_join(m, n, by="ID", jointype="FULL")
+  row.names(final) = as.vector(final[,"ID"])
+  final[,"ID"] = NULL
+  result = final
+  
+  return(result)
+}
+
+# minutely = function(){
+#   for(pair in pair_list){
+#     #Request tick history with count 1
+#     req = paste(paste(paste(paste('{
+#           "ticks_history": "', pair$symbol, sep=""), '",
+#           "adjust_start_time": 1,
+#           "count": ', sep=""), 1, sep=""), ',
+#           "end": "latest",
+#           "start": 5000,
+#           "style": "candles",
+#           "granularity": 60
+#         }', sep="")
+#     req = str_replace_all(req, "[\r\n\t]", "")
+#     req = str_replace_all(req, " ", "")
+#     ws$send(req)
+#     pair$hreq <<- TRUE
+#     
+#     if(ncol(prices) == 0){
+#       prices <<- data.frame(pair$standardized_close())
+#       colnames(prices) <<- pair$symbol
+#     }else{
+#       prices[pair$symbol] <<- pair$standardized_close()
+#     }
+#     
+#   }
+#   seconds_left = (60-second(lubridate::now("UTC")))
+#   later::later(minutely, seconds_left)
+# }
+
+minutely = function(){
+  for(pair in pair_list){
+    #Request tick history with count 1
+    req = paste(paste(paste(paste('{
+          "ticks_history": "', pair$symbol, sep=""), '",
+          "adjust_start_time": 1,
+          "count": ', sep=""), 1, sep=""), ',
+          "end": "latest",
+          "start": 5000,
+          "style": "candles",
+          "granularity": 60
+        }', sep="")
+    req = str_replace_all(req, "[\r\n\t]", "")
+    req = str_replace_all(req, " ", "")
+    ws$send(req)
+    pair$hreq = TRUE
+
+    if(ncol(prices) == 0){
+      prices <<- data.frame(pair$standardized_close())
+      colnames(prices) <<- pair$symbol
+    }else{
+      prices[pair$symbol] <<- pair$standardized_close()
+    }
+
+  }
+  minutely_task(prices)
+  seconds_left = (60-second(lubridate::now("UTC"))) * 1000
+  tclTaskChange(id="minutely", wait=seconds_left, redo = T)
+}
+
+tick = function(symbol, data){
+  tmp = data.table::copy(data)
+  tmp["close"] = (tmp["ask"] + tmp["bid"]) / 2
+  # `$`(pair_list, symbol)
+  i_dt = NULL
+  tryCatch({
+    i_dt = data.table::copy(pair_list[[symbol]]$data)
+  })
+  
+  if(!is.null(pair_list[[symbol]]) && !is.null(i_dt)){
+    tmp = tmp[,c("close", "epoch", "high", "low", "open")]
+    i_dt[datasz+1,] = tmp
+    pair_list[[symbol]]$set_data(i_dt)
+  }
+  
+}
+
+ohlc = function(symbol, data){
+  tmp = data.table::copy(data)
+  i_dt = NULL
+  tryCatch({
+    i_dt = data.table::copy(pair_list[[symbol]]$data)
+  })
+  
+  if(!is.null(pair_list[[symbol]]) && !is.null(i_dt)){
+    tryCatch({
+      tmp = tmp[,c("close", "epoch", "high", "low", "open")]
+      #rownames(tmp) = c(datasz+1)
+      i_dt[datasz+1,] = tmp
+      pair_list[[symbol]]$set_data(i_dt)
+    }, warning = function(war) {
+      err <<- paste (err, war, sep = "\nLine 277-9\n", collapse = NULL)
+    }, error = function(err0) {
+      err <<- paste (err, err0, sep = "\nLine 277-9\n", collapse = NULL)
+    })
+    
+  }
+}
+
+tick_history = function(symbol, data){
+  tmp = data.table::copy(data)
+  i_dt = NULL
+  tryCatch({
+    i_dt = data.table::copy(pair_list[[symbol]]$data)
+  })
+  
+  if(!is.null(pair_list[[symbol]]) && !is.null(i_dt)){
+    tryCatch({
+      if(datasz != nrow(i_dt)-1){
+        datasz <<- nrow(i_dt)-1
+      }
+      tmp = tmp[,c("close", "epoch", "high", "low", "open")]
+      i_dt[datasz+1,] = tmp[nrow(tmp),]
+      pair_list[[symbol]]$set_data(i_dt)
+      pair_list[[symbol]]$hreq <<- FALSE
+    }, warning = function(war) {
+      err <<- paste (err, war, sep = "\nLine 301-3\n", collapse = NULL)
+    }, error = function(err0) {
+      err <<- paste (err, err0, sep = "\nLine 301-3\n", collapse = NULL)
+    })
+    
+  }else{
+    tryCatch({
+      tmp = tmp[,c("close", "epoch", "high", "low", "open")]
+      ltmp = tmp[datasz,]
+      rownames(ltmp) = datasz+1
+      tmp = rbind(tmp, ltmp)
+      pair_list[[symbol]] <<- Pair$new(symbol = symbol, data = tmp, hreq = FALSE)
+    }, warning = function(war) {
+      err <<- paste (err, war, sep = "\nLine 314-6\n", collapse = NULL)
+    }, error = function(err0) {
+      err <<- paste (err, err0, sep = "\nLine 314-6\n", collapse = NULL)
+    })
+    
+  }
+  seconds_left = (60-second(lubridate::now("UTC"))) * 1000
+  tclTaskSchedule(seconds_left, minutely(), id="minutely", redo = T)
+  # minutely()
+}
+
+ws$onOpen(
+  function(event){
+    cat("Connected")
+    for (name in volatility_pairs) {
+      req = paste(paste(paste(paste('{
+        "ticks_history": "', name, sep=""), '",
+        "adjust_start_time": 1,
+        "count": ', sep=""), datasz, sep=""), ',
+        "end": "latest",
+        "start": 5000,
+        "style": "candles",
+        "granularity": 60,
+        "subscribe": 1
+      }', sep="")
+      # req = paste(paste(paste(paste('{
+      #   "ticks_history": "', name, sep=""), '",
+      #   "adjust_start_time": 1,
+      #   "count": ', sep=""), datasz, sep=""), ',
+      #   "end": "latest",
+      #   "start": 5000,
+      #   "style": "candles",
+      #   "granularity": 60
+      # }', sep="")
+      req = str_replace_all(req, "[\r\n\t]", "")
+      req = str_replace_all(req, " ", "")
+      ws$send(req)
+    }
+    #ws$send('{"ticks":"R_100"}')
+  })
+
+ws$onMessage(
+  function(event) {
+    msg <<- event$data
+    msg <<- jsonlite::fromJSON(msg) 
+    if("error" %in% msg){
+      print(msg)
+    }else{
+      message_type = msg$msg_type
+      
+      tryCatch({
+        if(message_type == "authorize"){
+          
+        }else if(message_type == "candles"){
+          tick_history(msg$echo_req$ticks_history, data.frame(msg$candles))
+        }else if(message_type == "forget_all"){
+          
+        }else if(message_type == "ohlc"){
+          ohlc(msg$ohlc$symbol, data.frame(msg$ohlc))
+        }else if(message_type == "tick"){
+          tick(msg$tick$symbol, data.frame(msg$tick))
+        }
+      }, warning = function(war) {
+        err <<- paste (err, war, sep = "\n", collapse = NULL)
+        # traceback(1, max.lines = 1)
+      }, error = function(err0) {
+        err <<- paste (err, err0, sep = "\n", collapse = NULL)
+        # traceback(1, max.lines = 1)
+      }, finally = {
+        
+      })
+
+    }
+    # cat(dt, "\n")
+  })
+
+subscribe = function(){
+  ws$connect()
+}
+
+login = function(api_token){
+  api_token = "1aStI5HCcty55Ly"
+  req = paste(paste('{"authorize": "', api_token, sep=""), '"}', sep="")
+  req = str_replace_all(req, "[\r\n\t]", "")
+  req = str_replace_all(req, " ", "")
+  ws$send(req)
+}
+
+logout = function(){
+  ws$send('{"logout":1}')
+}
+
+unsubscribe = function(){
+  tryCatch({
+    tclTaskDelete("minutely")
+  })
+  tryCatch({
+    ws$send('{"forget_all":"candles"}')
+  })
+  tryCatch({
+    ws$send('{"forget_all":"ticks"}')
+  })
+  tryCatch({
+    rm(list=ls())
+  })
+}
+
+close_all = function(){
+  logout()
+  unsubscribe()
+  ws$close()
+}
+
+buy = function(){
+  stake = 1
+  contract_type = "PUT"
+  duration = 1
+  duration_unit = "m"
+  symbol = "frxAUDJPY"
+  req = paste(paste(paste(paste(paste(paste(paste('{
+    "buy": "1","
+    "price": "', stake, sep=""), '",
+    "parameters": 
+        { 
+          "amount": "', stake, sep=""), '",
+          "basis": "stake",
+          "contract_type": "', contract_type, sep=""), '",
+          "currency": "USD",
+          "duration": "',  duration, sep=""), '",
+          "duration_unit": "', duration_unit, sep=""), '",
+          "symbol": "', symbol, sep=""),  '" 
+        },
+    "subscribe": "1"
+    }', sep="")
+  req = str_replace_all(req, "[\r\n\t]", "")
+  req = str_replace_all(req, " ", "")
+  ws$send(req)
+}

@@ -1,0 +1,26 @@
+{
+    "id": "1942B101",
+    "path": "~/Github/OatFX/OatFX/ui.R",
+    "project_path": "OatFX/ui.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1616758235375.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "24,43",
+        "scrollLine": "21"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1617000405,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1617000405345,
+    "read_only": false,
+    "read_only_alternatives": []
+}

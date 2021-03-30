@@ -1,0 +1,37 @@
+#
+# This is the user-interface definition of a Shiny web application. You can
+# run the application by clicking 'Run App' above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+library(shinyjs)
+
+# Define UI for application that draws a histogram
+shinyUI(
+    # htmlTemplate("www/index.html",
+    #              button0 = actionButton("show", "Log In")
+    # )
+    
+    htmlTemplate("index.html",
+                 button0 = actionButton("show", "Log In")
+    )
+
+    # fluidPage(
+    #     # Application title
+    #     titlePanel("OatFX"),
+    # 
+    # )
+    # navbarPage("OatFX"#,
+    #            # tabPanel("Plot"),
+    #            # navbarMenu("More",
+    #            #            tabPanel("Summary"),
+    #            #            tabPanel("Table")
+    #            # )
+    # )
+)
+
+
