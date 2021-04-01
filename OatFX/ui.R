@@ -18,7 +18,8 @@ source(here::here('OatFX/rscript','SharedObjects.R'))
 data_menu_item1 <- fluidRow(
     box(
         actionButton("subscribe", "Stream Data"),
-        actionButton("unsubscribe", "Stop streaming data")
+        actionButton("unsubscribe", "Stop streaming data"),
+        actionButton("refresh", "Refresh Plot")
     ),
     box(
         actionButton("logout", "Log Out")#,

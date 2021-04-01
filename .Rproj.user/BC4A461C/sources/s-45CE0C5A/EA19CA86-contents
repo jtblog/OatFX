@@ -23,6 +23,8 @@ prices = data.frame()
 corhm = NULL
 cointhm = NULL
 err=""
+scs = 0
+fnc = NULL
 
 ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
 
@@ -54,6 +56,7 @@ reorder_cormat = function(cormat){
 }
 
 minutely_task = function(prices){
+  cormat << NULL
   cormat <<- round(cor(prices),2)
   cointmat <<- as.matrix(round(coint(prices),4))
   # cormat = reorder_cormat(cormat)
@@ -159,6 +162,10 @@ coint = function(vars) {
           tradable_list[[id]]$set_data(dt)
         }
       }
+    }else{
+      if(!is.null(tradable_list[[id]])){
+        tradable_list[[id]] <- NULL
+      }
     }
     
   }
@@ -240,6 +247,11 @@ minutely = function(){
   minutely_task(prices)
   seconds_left = (60-second(lubridate::now("UTC"))) * 1000
   tclTaskChange(id="minutely", wait=seconds_left, redo = T)
+  scs <<- seconds_left
+  if(!is.null(fnc)){
+    fnc()
+  }
+  #ws$send('{"ping":1}')
 }
 
 tick = function(symbol, data){
@@ -448,4 +460,8 @@ buy = function(){
   req = str_replace_all(req, "[\r\n\t]", "")
   req = str_replace_all(req, " ", "")
   ws$send(req)
+}
+
+assign_function = function(in_0){
+  fnc <<- in_0
 }

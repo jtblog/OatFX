@@ -3,7 +3,7 @@
     "path": "~/Github/OatFX/OatFX/rscript/SharedObjects.R",
     "project_path": "OatFX/rscript/SharedObjects.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2679250474",
     "contents": "",
     "dirty": false,
     "created": 1616758191801.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "245,30",
-        "scrollLine": "233"
+        "cursorPosition": "58,16",
+        "scrollLine": "37"
     },
-    "folds": "",
-    "lastKnownWriteTime": 1617057206,
+    "folds": "40|31|43|0|\n45|33|48|0|\n50|34|55|0|\n111|24|190|0|\n256|30|271|0|\n273|30|293|0|\n295|38|334|0|\n337|18|364|2|\n367|19|399|2|\n401|23|403|0|\n405|28|411|0|\n413|20|415|0|\n417|25|430|0|\n432|23|436|0|\n438|17|462|0|\n",
+    "lastKnownWriteTime": 1617287652,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1617057206847,
+    "last_content_update": 1617287652106,
     "read_only": false,
     "read_only_alternatives": []
 }

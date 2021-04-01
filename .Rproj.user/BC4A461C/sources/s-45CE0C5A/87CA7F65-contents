@@ -1,16 +1,10 @@
 Pair <- setRefClass("Pair",
                        fields = list(symbol = "character", data = "data.frame", hreq = "logical"),
                        methods = list(
-                         # withdraw = function(x) {
-                         #   # bal <<- bal - x
-                         # },
-                         # deposit = function(x) {
-                         #   # bal <<- bal + x
-                         # },
                          standardized_close = function(){
                            close1 = as.numeric(data$close)
-                           # return ( close1 - mean(close1)) / sd(close1)
-                           return(close1)
+                           return ( close1 - mean(close1)) / sd(close1)
+                           # return(close1)
                          },
                          set_data = function(dt){
                            for(v in colnames(dt)){
@@ -26,12 +20,6 @@ Pair <- setRefClass("Pair",
 Combination <- setRefClass("Combination",
                            fields = list(symbol1 = "character", symbol2 = "character", data = "data.frame", positively_correlated = "logical", adf_p = "numeric"),
                            methods = list(
-                             # withdraw = function(x) {
-                             #   # bal <<- bal - x
-                             # },
-                             # deposit = function(x) {
-                             #   # bal <<- bal + x
-                             # }
                              standardized_close = function(){
                                return (data$close - mean(data$close)) / sd(data$close)
                              },
