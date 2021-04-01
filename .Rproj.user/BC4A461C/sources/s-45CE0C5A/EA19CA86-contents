@@ -56,7 +56,7 @@ reorder_cormat = function(cormat){
 }
 
 minutely_task = function(prices){
-  cormat << NULL
+  cormat <<- NULL
   cormat <<- round(cor(prices),2)
   cointmat <<- as.matrix(round(coint(prices),4))
   # cormat = reorder_cormat(cormat)
