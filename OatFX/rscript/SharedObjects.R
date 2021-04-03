@@ -22,9 +22,12 @@ tradable_list = list()
 prices = data.frame()
 corhm = NULL
 cointhm = NULL
+spreadplot = NULL
+pairwiseplot = NULL
 err=""
 scs = 0
 fnc = NULL
+pairings = list()
 
 ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
 
@@ -107,6 +110,21 @@ minutely_task = function(prices){
                     showarrow = F,
                     font=list(color='black'))
   
+  pairings = list()
+  for(tpair in tradable_list){
+    sym1 = tpair$symbol1
+    sym2 = tpair$symbol2
+    id = paste(sym1, paste('-', sym2, sep=""), sep = "")
+    id = str_replace_all(id, "[\r\n\t]", "")
+    id = str_replace_all(id, " ", "")
+    
+    ttle = str_replace_all(str_replace_all(id, "frx", ""), "-", " & ")
+    pairings[ttle] <<- id
+    
+    # str_detect("frxAUDJPY", "frx")
+    # str_replace_all("frxAUDJPYfrx", "frx", "pattern")
+  }
+  
 }
 
 coint = function(vars) {
@@ -131,7 +149,7 @@ coint = function(vars) {
     id = paste(sym1, paste('-', sym2, sep=""), sep = "")
     id = str_replace_all(id, "[\r\n\t]", "")
     id = str_replace_all(id, " ", "")
-    if(p < 0.05){
+    if(p < 1){
       cordf = as.data.frame(cormat)
       dt = data.frame(`res` = as.numeric(res))
       corr = as.numeric(cordf[sym1, sym2])
@@ -139,7 +157,7 @@ coint = function(vars) {
       tryCatch({
         i_dt = data.table::copy(tradable_list[[id]]$data)
       })
-      if(corr > 0.5){
+      if(corr > 0){
         # Pair is positively correlated
         if(is.null(i_dt)){
             tradable_list[[id]] <<-
@@ -150,7 +168,7 @@ coint = function(vars) {
         }else{
           tradable_list[[id]]$set_data(dt)
         }
-      }else if(corr < -0.5){
+      }else if(corr < 0){
         # Pair is negatively correlated
         if(is.null(i_dt)){
           tradable_list[[id]] <<-
@@ -465,3 +483,38 @@ buy = function(){
 assign_function = function(in_0){
   fnc <<- in_0
 }
+
+getpwiseplot <- function(in_1){
+  if(is.null(in_1) || is.na(in_1)){
+    pairwiseplot <<- NULL
+  }else{
+    symbols = unique(strsplit(in_1, "-")[[1]])
+    pairwiseplot <<- plot_ly(prices, x = as.numeric(rownames(prices)), 
+                             y= as.formula(paste0("~`", symbols[1], "`")), 
+                             type='scatter', mode='lines', 
+                             name = str_replace_all(symbols[1], "frx", ""))
+    pairwiseplot <<- pairwiseplot %>% plotly::add_trace(prices, x= as.numeric(rownames(prices)), 
+                                                        y= as.formula(paste0("~`", symbols[2], "`")), 
+                                                        type='scatter', mode='line', 
+                                                        name = str_replace_all(symbols[2], "frx", ""))
+  }
+  return(pairwiseplot)
+}
+
+getspreadplot <- function(in_2){
+  if(is.null(in_2) || is.na(in_2)){
+    spreadplot <<- NULL
+  }else{
+    pdt = tradable_list[[in_2]][[".->data"]]
+    spreadplot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, type='scatter', mode='lines')
+  }
+  return(spreadplot)
+}
+
+# pdt = tradable_list[["R_10-R_100"]][[".->data"]]
+# p = plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, type='scatter', mode='lines')
+
+# p = plot_ly(prices, x = as.numeric(rownames(prices)), y= ~R_100, type='scatter', mode='lines', name = 'R_100')
+# p = p %>% plotly::add_trace(prices, x= as.numeric(rownames(prices)), y= ~R_10, type='scatter', mode='line', name = 'R_10')
+
+# v = unique(strsplit("R-C", "-")[[1]])

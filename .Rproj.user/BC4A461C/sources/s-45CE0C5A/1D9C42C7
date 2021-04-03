@@ -3,7 +3,7 @@
     "path": "~/Github/OatFX/OatFX/server.R",
     "project_path": "OatFX/server.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "1427376383",
     "contents": "",
     "dirty": false,
     "created": 1616758240268.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "55,15",
-        "scrollLine": "44"
+        "cursorPosition": "70,33",
+        "scrollLine": "50"
     },
     "folds": "",
-    "lastKnownWriteTime": 1617286831,
+    "lastKnownWriteTime": 1617426978,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1617286831771,
+    "last_content_update": 1617426978385,
     "read_only": false,
     "read_only_alternatives": []
 }

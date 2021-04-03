@@ -17,8 +17,13 @@ shinyServer(function(input, output, session) {
         
     r_activ_objs <- reactiveValues(sc = scs)
     
+    chs <- reactive({
+        pairings
+    })
+    
     observe({
-        click("refresh")
+        # click("refresh")
+        updateSelectInput(session,"pairs",choices = pairings)
     })
     
     observeEvent(input$subscribe, {
@@ -49,21 +54,25 @@ shinyServer(function(input, output, session) {
         output$cointPlot <- renderPlotly({NULL})
         output$corPlot <- renderPlotly({corhm})
         output$cointPlot <- renderPlotly({cointhm})
+        updateSelectInput(session,"pairs",choices = pairings)
+        output$resPlot <- renderPlotly({NULL})
+        output$resPlot <- renderPlotly({getspreadplot(input$pairs)})
+        output$dpairsPlot <- renderPlotly({NULL})
+        output$dpairsPlot <- renderPlotly({getpwiseplot(input$pairs)})
     }
     
     assign_function(refreshplot)
     
-    # observe({
-    #     #print("render")
-    #     r_activ_objs$cor_p <- corhm
-    #     r_activ_objs$coint_p <- cointhm
-    #     output$corPlot <- renderPlot(r_activ_objs$cor_p)
-    #     output$cointPlot <- renderPlot(r_activ_objs$coint_p)
-    # })
+    output$resPlot <- renderPlotly({
+        getspreadplot(input$pairs)
+    })
     
-    # observe({
-    #     click("btn")
-    #     invalidateLater(3000)
+    output$dpairsPlot <- renderPlotly({
+        getpwiseplot(input$pairs)
+    })
+    
+    # output$text0 <- renderText({
+    #     paste("You chose", input$pairs)
     # })
 
 })

@@ -23,7 +23,7 @@ data_menu_item1 <- fluidRow(
     ),
     box(
         actionButton("logout", "Log Out")#,
-        # textAreaInput("err", "ERROR", "No error", rows = 18, width = "100%", resize = "none")
+        # textOutput("err", "ERROR", "No error", rows = 18, width = "100%", resize = "none")
     )
     )
 data_menu_item2 <- fluidRow(
@@ -36,15 +36,27 @@ data_menu_item2 <- fluidRow(
     )
     
 
-pairs_menu_item <- fluidRow(
-    tabBox(
-        # title = "First tabBox",
-        # # The id lets us use input$tabset1 on the server to find the current tab
-        # id = "tabset1", height = "250px",
-        # tabPanel("Tab1", "First tab content"),
-        # tabPanel("Tab2", "Tab content 2")
+pairs_menu_item1 <- fluidRow(
+    box(
+        selectInput("pairs", "Pairs detected", pairings)
+    ),
+    box(
+        textOutput("text0")
+        # actionButton("todo0", "To be determined")#,
     )
 )
+
+pairs_menu_item2 <- fluidRow(
+    tabBox(
+        # title = "First tabBox",
+        # The id lets us use input$tabset1 on the server to find the current tab
+        id = "tabset1", width="100%",
+        tabPanel("Spread/Residuals", plotlyOutput("resPlot")),
+        tabPanel("Pairwise Plot", plotlyOutput("dpairsPlot"))
+    )  
+    
+)
+
 
 header <- dashboardHeader(title = "OatFX")
 
@@ -63,7 +75,7 @@ body <- dashboardBody(
     tabItems(
         tabItem(tabName = "data", data_menu_item1, data_menu_item2),
         
-        tabItem(tabName = "pairs", pairs_menu_item)
+        tabItem(tabName = "pairs", pairs_menu_item1, pairs_menu_item2)
     )
 )
 

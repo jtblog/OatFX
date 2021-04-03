@@ -3,17 +3,17 @@
     "path": "~/Github/OatFX/OatFX/rscript/model.R",
     "project_path": "OatFX/rscript/model.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2592512256",
     "contents": "",
     "dirty": false,
     "created": 1616978378104.0,
     "source_on_save": false,
-    "relative_order": 3,
+    "relative_order": 2,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "5,42",
-        "scrollLine": "0"
+        "cursorPosition": "20,48",
+        "scrollLine": "4"
     },
     "folds": "",
     "lastKnownWriteTime": 1617268474,
