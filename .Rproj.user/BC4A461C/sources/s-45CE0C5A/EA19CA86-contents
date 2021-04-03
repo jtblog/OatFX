@@ -24,6 +24,7 @@ corhm = NULL
 cointhm = NULL
 spreadplot = NULL
 pairwiseplot = NULL
+standardRatioPlot = NULL
 err=""
 scs = 0
 fnc = NULL
@@ -151,7 +152,13 @@ coint = function(vars) {
     id = str_replace_all(id, " ", "")
     if(p < 1){
       cordf = as.data.frame(cormat)
-      dt = data.frame(`res` = as.numeric(res))
+      dt = data.frame(`res` = as.numeric(res), 
+                      `ratio`= as.numeric(unlist(prices[sym1] / prices[sym2])))
+      dt$standard_ratio = (dt$ratio - mean(dt$ratio)) / sd(dt$ratio)
+      dt$res_ub = mean(dt$res) + sd(dt$res)
+      dt$res_lb = mean(dt$res) - sd(dt$res)
+      dt$zub = mean(dt$standard_ratio) + sd(dt$standard_ratio)
+      dt$zlb = mean(dt$standard_ratio) - sd(dt$standard_ratio)
       corr = as.numeric(cordf[sym1, sym2])
       i_dt = NULL
       tryCatch({
@@ -506,15 +513,41 @@ getspreadplot <- function(in_2){
     spreadplot <<- NULL
   }else{
     pdt = tradable_list[[in_2]][[".->data"]]
-    spreadplot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, type='scatter', mode='lines')
+    spreadplot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, 
+                           type='scatter', mode='lines', name="Residuals/Spread")
+    spreadplot <<- spreadplot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
+                                                                  y = ~res_ub,
+                                                                  type='scatter', mode='line',
+                                                                  name = "Ceiling")
+    spreadplot <<- spreadplot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
+                                                                  y = ~res_lb,
+                                                                  type='scatter', mode='line',
+                                                                  name = "Floor")
   }
   return(spreadplot)
 }
 
-# pdt = tradable_list[["R_10-R_100"]][[".->data"]]
-# p = plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, type='scatter', mode='lines')
+getSRatioplot <- function(in_3){
+  if(is.null(in_3) || is.na(in_3)){
+    standardRatioPlot <<- NULL
+  }else{
+    pdt = tradable_list[[in_3]][[".->data"]]
+    standardRatioPlot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~standard_ratio, 
+                                  type='scatter', mode='lines', name="Standard Ratio")
+    standardRatioPlot <<- standardRatioPlot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
+                                                                  y = ~zub,
+                                                        type='scatter', mode='line',
+                                                        name = "Ceiling")
+    standardRatioPlot <<- standardRatioPlot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
+                                                                  y = ~zlb,
+                                                                  type='scatter', mode='line',
+                                                                  name = "Floor")
+  }
+  return(standardRatioPlot)
+}
 
-# p = plot_ly(prices, x = as.numeric(rownames(prices)), y= ~R_100, type='scatter', mode='lines', name = 'R_100')
-# p = p %>% plotly::add_trace(prices, x= as.numeric(rownames(prices)), y= ~R_10, type='scatter', mode='line', name = 'R_10')
+# for(rw in rownames(test)){
+#   test$c[as.numeric(rw)] <- 
+#     if(test$a[as.numeric(rw)] == test$b[as.numeric(rw)]) "buy" else "sell"
+# }
 
-# v = unique(strsplit("R-C", "-")[[1]])

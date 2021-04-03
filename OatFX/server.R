@@ -55,10 +55,12 @@ shinyServer(function(input, output, session) {
         output$corPlot <- renderPlotly({corhm})
         output$cointPlot <- renderPlotly({cointhm})
         updateSelectInput(session,"pairs",choices = pairings)
-        output$resPlot <- renderPlotly({NULL})
-        output$resPlot <- renderPlotly({getspreadplot(input$pairs)})
-        output$dpairsPlot <- renderPlotly({NULL})
-        output$dpairsPlot <- renderPlotly({getpwiseplot(input$pairs)})
+        # output$resPlot <- renderPlotly({NULL})
+        # output$resPlot <- renderPlotly({getspreadplot(input$pairs)})
+        # output$dpairsPlot <- renderPlotly({NULL})
+        # output$dpairsPlot <- renderPlotly({getpwiseplot(input$pairs)})
+        # output$ratioPlot <- renderPlotly({NULL})
+        # output$ratioPlot <- renderPlotly({getSRatioplot(input$pairs)})
     }
     
     assign_function(refreshplot)
@@ -71,8 +73,42 @@ shinyServer(function(input, output, session) {
         getpwiseplot(input$pairs)
     })
     
-    # output$text0 <- renderText({
-    #     paste("You chose", input$pairs)
-    # })
+    output$ratioPlot <- renderPlotly({
+        getSRatioplot(input$pairs)
+    })
+    
+    observeEvent(input$pairs, {
+        if(!is.null(input$pairs)){
+            sym1 = unique(strsplit(input$pairs, "-")[[1]])[1]
+            output$sym1 <- renderText({sym1})
+            sym2 = unique(strsplit(input$pairs, "-")[[1]])[2]
+            output$sym2 <- renderText({sym2})
+        }
+    })
+    
+    observeEvent(input$purchase1, {
+        if(!is.null(input$pairs)){
+            sym1 = unique(strsplit(input$pairs, "-")[[1]])[1]
+            if(!is.na(as.numeric(input$stake1)) && !is.na(as.numeric(input$duration1))){
+                stake1 = input$stake1
+                duration1 = input$duration1
+                duration_unit1 = input$duration_unit1
+                # output$sym1 <- renderText({is.numeric(stake1)})
+            }
+        }
+    })
+    
+    observeEvent(input$purchase2, {
+        if(!is.null(input$pairs)){
+            sym2 = unique(strsplit(input$pairs, "-")[[1]])[2]
+            if(!is.na(as.numeric(input$stake2)) && !is.na(as.numeric(input$duration2))){
+                stake2 = input$stake2
+                duration2 = input$duration2
+                duration_unit2 = input$duration_unit2
+                # output$sym2 <- renderText({is.numeric(stake2)})
+            }
+        }
+    })
+    
 
 })

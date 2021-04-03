@@ -35,24 +35,65 @@ data_menu_item2 <- fluidRow(
     )
     )
     
-
 pairs_menu_item1 <- fluidRow(
     box(
         selectInput("pairs", "Pairs detected", pairings)
     ),
     box(
-        textOutput("text0")
-        # actionButton("todo0", "To be determined")#,
+        # plotlyOutput("cointPlot")
     )
+    
 )
 
 pairs_menu_item2 <- fluidRow(
+    box(
+        box(
+            textOutput("sym1")
+        ),
+        box(
+            textInput("stake1", "Stake1:")
+        ),
+        box(
+            textInput("duration1", "Duration1:")
+        ),
+        box(
+            selectInput("duration_unit1", "Duration Unit 1", 
+                        c("Minutes" = "m", "Hours" = "h", "Days" = "d") )
+        ),
+        box(
+            actionButton("purchase1", "Purchase 1")
+        )
+    ),
+    box(
+        box(
+            textOutput("sym2")
+        ),
+        box(
+            textInput("stake2", "Stake2:")
+        ),
+        box(
+            textInput("duration2", "Duration2:")
+        ),
+        box(
+            selectInput("duration_unit2", "Duration Unit 2", 
+                        c("Minutes" = "m", "Hours" = "h", "Days" = "d") )
+        ),
+        box(
+            actionButton("purchase2", "Purchase 2")
+        )
+    )
+)
+
+
+
+pairs_menu_item3 <- fluidRow(
     tabBox(
         # title = "First tabBox",
         # The id lets us use input$tabset1 on the server to find the current tab
         id = "tabset1", width="100%",
+        tabPanel("Pairwise Plot", plotlyOutput("dpairsPlot")),
         tabPanel("Spread/Residuals", plotlyOutput("resPlot")),
-        tabPanel("Pairwise Plot", plotlyOutput("dpairsPlot"))
+        tabPanel("Ratios", plotlyOutput("ratioPlot"))
     )  
     
 )
@@ -75,7 +116,7 @@ body <- dashboardBody(
     tabItems(
         tabItem(tabName = "data", data_menu_item1, data_menu_item2),
         
-        tabItem(tabName = "pairs", pairs_menu_item1, pairs_menu_item2)
+        tabItem(tabName = "pairs", pairs_menu_item1, pairs_menu_item2, pairs_menu_item3)
     )
 )
 
