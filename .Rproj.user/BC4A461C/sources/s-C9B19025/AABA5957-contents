@@ -31,7 +31,6 @@ err=""
 scs = 0
 fnc = NULL
 pairings = list()
-corrtypeneeded = "neg"
 
 ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
 
@@ -153,10 +152,8 @@ coint = function(vars) {
     id = paste(sym1, paste('-', sym2, sep=""), sep = "")
     id = str_replace_all(id, "[\r\n\t]", "")
     id = str_replace_all(id, " ", "")
-    if(!is.null(tradable_list[[id]])){
-      tradable_list[[id]] <- NULL
-    }
-    if(p < 0.05){
+    # if(p < 0.05){
+    if(p < 1){
       cordf = as.data.frame(cormat)
       dt = data.frame(`res` = as.numeric(res), 
                       `ratio`= as.numeric(unlist(prices[sym1] / prices[sym2])))
@@ -170,32 +167,34 @@ coint = function(vars) {
       tryCatch({
         i_dt = data.table::copy(tradable_list[[id]]$data)
       })
-      if(corr > 0.5){
+      # if(corr > 0.5){
+      if(corr > 0){
         # Pair is positively correlated
-        if(corrtypeneeded == "pos"){
-          if(is.null(i_dt)){
+        if(is.null(i_dt)){
             tradable_list[[id]] <<-
               Combination$new(symbol1 = sym1,
                               symbol2 = sym2,
                               data = dt, positively_correlated=T,
                               adf_p = p)
-          }else{
-            tradable_list[[id]]$set_data(dt)
-          }
+        }else{
+          tradable_list[[id]]$set_data(dt)
         }
-      }else if(corr < -0.5){
+      # }else if(corr < -0.5){
+      }else if(corr < 0){
         # Pair is negatively correlated
-        if(corrtypeneeded == "neg"){
-          if(is.null(i_dt)){
-            tradable_list[[id]] <<-
-              Combination$new(symbol1 = sym1,
-                              symbol2 = sym2,
-                              data = dt, positively_correlated=F,
-                              adf_p = p)
-          }else{
-            tradable_list[[id]]$set_data(dt)
-          }
+        if(is.null(i_dt)){
+          tradable_list[[id]] <<-
+            Combination$new(symbol1 = sym1,
+                            symbol2 = sym2,
+                            data = dt, positively_correlated=F,
+                            adf_p = p)
+        }else{
+          tradable_list[[id]]$set_data(dt)
         }
+      }
+    }else{
+      if(!is.null(tradable_list[[id]])){
+        tradable_list[[id]] <- NULL
       }
     }
     
@@ -249,10 +248,6 @@ coint = function(vars) {
 #   seconds_left = (60-second(lubridate::now("UTC")))
 #   later::later(minutely, seconds_left)
 # }
-
-setCorrCat <- function(in_4){
-  corrtypeneeded <<- in_4
-}
 
 minutely = function(){
   for(pair in pair_list){

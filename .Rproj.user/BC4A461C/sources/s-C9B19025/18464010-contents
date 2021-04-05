@@ -40,11 +40,7 @@ data_menu_item2 <- fluidRow(
     
 pairs_menu_item1 <- fluidRow(
     box(
-        radioButtons("corrval", label = "Positively/Negatively Correlated Pairs?",
-                     selected = "neg",
-                           choiceNames = list("Trade negatives", "Trade positives"), 
-                           choiceValues = list("neg", "pos")),
-        selectInput("pairs", "Pairs", pairings)
+        selectInput("pairs", "Pairs detected", pairings)
     ),
     box(
         textOutput("sym2"),

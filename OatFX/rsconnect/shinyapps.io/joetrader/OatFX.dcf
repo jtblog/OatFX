@@ -1,0 +1,12 @@
+name: oatfx
+title: OatFX
+username:
+account: joetrader
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3905387
+bundleId: 4427800
+url: https://joetrader.shinyapps.io/OatFX/
+when: 1617474471.61482
+asMultiple: FALSE
+asStatic: FALSE

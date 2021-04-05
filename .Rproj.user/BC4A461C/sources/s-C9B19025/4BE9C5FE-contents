@@ -34,10 +34,6 @@ shinyServer(function(input, output, session) {
         login(input$token)
     })
     
-    observeEvent(input$corrval, {
-        setCorrCat(input$corrval)
-    })
-    
     # observeEvent(input$pairs, {
     #     current_selection(input$pairs)
     # })

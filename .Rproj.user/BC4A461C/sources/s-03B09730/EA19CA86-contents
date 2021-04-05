@@ -3,20 +3,22 @@ library(lubridate)
 library(jsonlite)
 library(tseries)
 library(stringr)
+library(stringi)
 library(here)
 library(tseries)
 library(reshape2)
 library(ggplot2)
 library(plotly)
-library(RColorBrewer)
+# library(RColorBrewer)
 library(rqdatatable)
 library(tcltk2)
-library(later)
-# source("~/Github/OatFX/OatFX/rscript/model.R")
-source(here::here('OatFX/rscript','model.R'))
+# library(later)
+
+# source("OatFX/rscript/model.R")
+# source(here::here('OatFX/rscript','model.R'))
 
 msg = NULL 
-datasz = 1000
+datasz = 180
 pair_list = list()
 tradable_list = list()
 prices = data.frame()
@@ -29,6 +31,7 @@ err=""
 scs = 0
 fnc = NULL
 pairings = list()
+corrtypeneeded = "neg"
 
 ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
 
@@ -150,7 +153,10 @@ coint = function(vars) {
     id = paste(sym1, paste('-', sym2, sep=""), sep = "")
     id = str_replace_all(id, "[\r\n\t]", "")
     id = str_replace_all(id, " ", "")
-    if(p < 1){
+    if(!is.null(tradable_list[[id]])){
+      tradable_list[[id]] <- NULL
+    }
+    if(p < 0.05){
       cordf = as.data.frame(cormat)
       dt = data.frame(`res` = as.numeric(res), 
                       `ratio`= as.numeric(unlist(prices[sym1] / prices[sym2])))
@@ -164,32 +170,32 @@ coint = function(vars) {
       tryCatch({
         i_dt = data.table::copy(tradable_list[[id]]$data)
       })
-      if(corr > 0){
+      if(corr > 0.5){
         # Pair is positively correlated
-        if(is.null(i_dt)){
+        if(corrtypeneeded == "pos"){
+          if(is.null(i_dt)){
             tradable_list[[id]] <<-
               Combination$new(symbol1 = sym1,
                               symbol2 = sym2,
                               data = dt, positively_correlated=T,
                               adf_p = p)
-        }else{
-          tradable_list[[id]]$set_data(dt)
+          }else{
+            tradable_list[[id]]$set_data(dt)
+          }
         }
-      }else if(corr < 0){
+      }else if(corr < -0.5){
         # Pair is negatively correlated
-        if(is.null(i_dt)){
-          tradable_list[[id]] <<-
-            Combination$new(symbol1 = sym1,
-                            symbol2 = sym2,
-                            data = dt, positively_correlated=F,
-                            adf_p = p)
-        }else{
-          tradable_list[[id]]$set_data(dt)
+        if(corrtypeneeded == "neg"){
+          if(is.null(i_dt)){
+            tradable_list[[id]] <<-
+              Combination$new(symbol1 = sym1,
+                              symbol2 = sym2,
+                              data = dt, positively_correlated=F,
+                              adf_p = p)
+          }else{
+            tradable_list[[id]]$set_data(dt)
+          }
         }
-      }
-    }else{
-      if(!is.null(tradable_list[[id]])){
-        tradable_list[[id]] <- NULL
       }
     }
     
@@ -243,6 +249,10 @@ coint = function(vars) {
 #   seconds_left = (60-second(lubridate::now("UTC")))
 #   later::later(minutely, seconds_left)
 # }
+
+setCorrCat <- function(in_4){
+  corrtypeneeded <<- in_4
+}
 
 minutely = function(){
   for(pair in pair_list){
@@ -362,13 +372,13 @@ tick_history = function(symbol, data){
 ws$onOpen(
   function(event){
     cat("Connected")
-    for (name in volatility_pairs) {
+    for (name in forex_major_pairs) {
       req = paste(paste(paste(paste('{
         "ticks_history": "', name, sep=""), '",
         "adjust_start_time": 1,
         "count": ', sep=""), datasz, sep=""), ',
         "end": "latest",
-        "start": 5000,
+        "start": 1,
         "style": "candles",
         "granularity": 60,
         "subscribe": 1
@@ -394,7 +404,7 @@ ws$onMessage(
     msg <<- event$data
     msg <<- jsonlite::fromJSON(msg) 
     if("error" %in% msg){
-      print(msg)
+      err=msg
     }else{
       message_type = msg$msg_type
       
@@ -429,7 +439,10 @@ subscribe = function(){
 }
 
 login = function(api_token){
-  api_token = "1aStI5HCcty55Ly"
+  api_token = str_replace_all(api_token, " ", "")
+  if(stringi::stri_isempty(api_token)){
+    api_token = "1aStI5HCcty55Ly"
+  }
   req = paste(paste('{"authorize": "', api_token, sep=""), '"}', sep="")
   req = str_replace_all(req, "[\r\n\t]", "")
   req = str_replace_all(req, " ", "")
@@ -455,18 +468,18 @@ unsubscribe = function(){
   })
 }
 
-close_all = function(){
-  logout()
-  unsubscribe()
-  ws$close()
-}
+# close_all = function(){
+#   logout()
+#   unsubscribe()
+#   ws$close()
+# }
 
-buy = function(){
-  stake = 1
-  contract_type = "PUT"
-  duration = 1
-  duration_unit = "m"
-  symbol = "frxAUDJPY"
+buy = function(stake, contract_type, duration, duration_unit, symbol){
+  # stake = 1
+  # contract_type = "PUT"
+  # duration = 1
+  # duration_unit = "m"
+  # symbol = "frxAUDJPY"
   req = paste(paste(paste(paste(paste(paste(paste('{
     "buy": "1","
     "price": "', stake, sep=""), '",
@@ -514,7 +527,8 @@ getspreadplot <- function(in_2){
   }else{
     pdt = tradable_list[[in_2]][[".->data"]]
     spreadplot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, 
-                           type='scatter', mode='lines', name="Residuals/Spread")
+                           type='scatter', mode='lines', 
+                           name=paste("Residuals/Spread", str_replace_all(in_2, "-", "~"),sep = ":"))
     spreadplot <<- spreadplot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~res_ub,
                                                                   type='scatter', mode='line',
@@ -533,7 +547,8 @@ getSRatioplot <- function(in_3){
   }else{
     pdt = tradable_list[[in_3]][[".->data"]]
     standardRatioPlot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~standard_ratio, 
-                                  type='scatter', mode='lines', name="Standard Ratio")
+                                  type='scatter', mode='lines', 
+                                  name=paste("Standard Ratio", str_replace_all(in_3, "-", "/"),sep = ":"))
     standardRatioPlot <<- standardRatioPlot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~zub,
                                                         type='scatter', mode='line',
