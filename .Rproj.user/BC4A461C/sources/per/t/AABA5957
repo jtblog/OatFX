@@ -1,0 +1,26 @@
+{
+    "id": "AABA5957",
+    "path": "~/Github/OatFX/OatFX/rscript/SharedObjects.R",
+    "project_path": "OatFX/rscript/SharedObjects.R",
+    "type": "r_source",
+    "hash": "577239795",
+    "contents": "",
+    "dirty": false,
+    "created": 1617634612741.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "334,2",
+        "scrollLine": "249"
+    },
+    "folds": "48|31|51|0|\n53|33|56|0|\n58|34|63|0|\n65|33|132|0|\n134|24|222|0|\n253|29|287|0|\n289|22|324|0|\n326|30|341|0|\n343|30|363|0|\n356|32|358|4|\n358|31|360|4|\n365|38|404|0|\n383|31|385|4|\n394|32|396|4|\n396|31|398|4|\n407|18|434|2|\n437|19|469|2|\n457|34|460|6|\n460|33|463|6|\n476|48|488|0|\n490|20|492|0|\n494|25|507|0|\n515|70|541|0|\n543|33|545|0|\n547|31|562|0|\n564|32|582|0|\n584|32|602|0|\n",
+    "lastKnownWriteTime": 1617701193,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1617701197433,
+    "read_only": false,
+    "read_only_alternatives": []
+}

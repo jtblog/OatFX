@@ -5,8 +5,8 @@ account: joetrader
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3905387
-bundleId: 4427800
+bundleId: 4436748
 url: https://joetrader.shinyapps.io/OatFX/
-when: 1617474471.61482
+when: 1617702536.32792
 asMultiple: FALSE
 asStatic: FALSE

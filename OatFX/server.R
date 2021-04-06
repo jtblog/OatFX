@@ -14,6 +14,10 @@ library(here)
 source('rscript/model.R')
 source('rscript/SharedObjects.R')
 
+
+sym1 = ""
+sym2 = ""
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
         
@@ -94,28 +98,42 @@ shinyServer(function(input, output, session) {
         getSRatioplot(input$pairs)
     })
     
-    observeEvent(input$pairs, {
+    observeEvent(input$swap1, {
+        output$txt1 <- renderText({input$pairs})
+        output$txt2 <- renderText({input$pairs})
+        output$txt3 <- renderText({input$pairs})
         if(!is.null(input$pairs) && !is.na(input$pairs)){
-            sym1 = unique(strsplit(input$pairs, "-")[[1]])[1]
-            sym2 = unique(strsplit(input$pairs, "-")[[1]])[2]
             if(as.logical(input$swap1) == TRUE){
-                output$sym1 <- renderText({sym1})
-                output$sym2 <- renderText({sym2})
+                sym1 <<- unique(strsplit(input$pairs, "-")[[1]])[2]
+                sym2 <<- unique(strsplit(input$pairs, "-")[[1]])[1]
             }else{
-                output$sym1 <- renderText({sym2})
-                output$sym2 <- renderText({sym1})
+                sym1 <<- unique(strsplit(input$pairs, "-")[[1]])[1]
+                sym2 <<- unique(strsplit(input$pairs, "-")[[1]])[2]
             }
+            output$sym1 <- renderText({sym1})
+            output$sym2 <- renderText({sym2})
+        }
+    })
+    
+    observeEvent(input$pairs, {
+        output$txt1 <- renderText({input$pairs})
+        output$txt2 <- renderText({input$pairs})
+        output$txt3 <- renderText({input$pairs})
+        if(!is.null(input$pairs) && !is.na(input$pairs)){
+            if(as.logical(input$swap1) == TRUE){
+                sym1 <<- unique(strsplit(input$pairs, "-")[[1]])[2]
+                sym2 <<- unique(strsplit(input$pairs, "-")[[1]])[1]
+            }else{
+                sym1 <<- unique(strsplit(input$pairs, "-")[[1]])[1]
+                sym2 <<- unique(strsplit(input$pairs, "-")[[1]])[2]
+            }
+            output$sym1 <- renderText({sym1})
+            output$sym2 <- renderText({sym2})
         }
     })
     
     observeEvent(input$put1, {
         if(!is.null(input$pairs) && !is.na(input$pairs)){
-            sym1 = unique(strsplit(input$pairs, "-")[[1]])[1]
-            sym2 = unique(strsplit(input$pairs, "-")[[1]])[2]
-            if(as.logical(input$swap1) == TRUE){
-                sym1 = unique(strsplit(input$pairs, "-")[[1]])[2]
-                sym2 = unique(strsplit(input$pairs, "-")[[1]])[1]
-            }
             
             if(!is.na(as.numeric(input$stake1)) && !is.na(as.numeric(input$duration1))){
                 contract_type1 = "PUT"
@@ -139,13 +157,6 @@ shinyServer(function(input, output, session) {
     
     observeEvent(input$call1, {
         if(!is.null(input$pairs) && !is.na(input$pairs)){
-            sym1 = unique(strsplit(input$pairs, "-")[[1]])[1]
-            sym2 = unique(strsplit(input$pairs, "-")[[1]])[2]
-            if(as.logical(input$swap1) == TRUE){
-                sym1 = unique(strsplit(input$pairs, "-")[[1]])[2]
-                sym2 = unique(strsplit(input$pairs, "-")[[1]])[1]
-            }
-            
             if(!is.na(as.numeric(input$stake1)) && !is.na(as.numeric(input$duration1))){
                 contract_type1 = "CALL"
                 contract_type2 = "PUT"

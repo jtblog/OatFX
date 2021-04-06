@@ -12,7 +12,7 @@ library(plotly)
 # library(RColorBrewer)
 library(rqdatatable)
 library(tcltk2)
-# library(later)
+library(later)
 
 # source("OatFX/rscript/model.R")
 # source(here::here('OatFX/rscript','model.R'))
@@ -34,6 +34,7 @@ pairings = list()
 corrtypeneeded = "neg"
 
 ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = FALSE)
+# ws = WebSocket$new("wss://ws.binaryws.com/websockets/v3?app_id=15805", autoConnect = T)
 
 forex_major_pairs = c("frxAUDJPY", "frxAUDUSD",
                        "frxEURAUD", "frxEURCAD", "frxEURCHF",
@@ -114,7 +115,7 @@ minutely_task = function(prices){
                     showarrow = F,
                     font=list(color='black'))
   
-  pairings = list()
+  pairings <<- list()
   for(tpair in tradable_list){
     sym1 = tpair$symbol1
     sym2 = tpair$symbol2
@@ -154,7 +155,7 @@ coint = function(vars) {
     id = str_replace_all(id, "[\r\n\t]", "")
     id = str_replace_all(id, " ", "")
     if(!is.null(tradable_list[[id]])){
-      tradable_list[[id]] <- NULL
+      tradable_list[[id]] <<- NULL
     }
     if(p < 0.05){
       cordf = as.data.frame(cormat)
@@ -252,6 +253,38 @@ coint = function(vars) {
 
 setCorrCat <- function(in_4){
   corrtypeneeded <<- in_4
+  if(corrtypeneeded == "neg"){
+    pairings <<- list()
+    for(tpair in tradable_list){
+      if(tpair$positively_correlated){
+        tpair <<- NULL
+      }else{
+        sym1 = tpair$symbol1
+        sym2 = tpair$symbol2
+        id = paste(sym1, paste('-', sym2, sep=""), sep = "")
+        id = str_replace_all(id, "[\r\n\t]", "")
+        id = str_replace_all(id, " ", "")
+        ttle = str_replace_all(str_replace_all(id, "frx", ""), "-", " & ")
+        pairings[ttle] <<- id
+      }
+    }
+  }else if(corrtypeneeded == "pos"){
+    pairings <<- list()
+    for(tpair in tradable_list){
+      if(tpair$positively_correlated){
+        sym1 = tpair$symbol1
+        sym2 = tpair$symbol2
+        id = paste(sym1, paste('-', sym2, sep=""), sep = "")
+        id = str_replace_all(id, "[\r\n\t]", "")
+        id = str_replace_all(id, " ", "")
+        ttle = str_replace_all(str_replace_all(id, "frx", ""), "-", " & ")
+        pairings[ttle] <<- id
+      }else{
+        tpair <<- NULL
+      }
+    }
+  }
+  
 }
 
 minutely = function(){
@@ -268,7 +301,9 @@ minutely = function(){
         }', sep="")
     req = str_replace_all(req, "[\r\n\t]", "")
     req = str_replace_all(req, " ", "")
-    ws$send(req)
+    if(ws$readyState() == 1L){
+      ws$send(req)
+    }
     pair$hreq = TRUE
 
     if(ncol(prices) == 0){
@@ -436,17 +471,21 @@ ws$onMessage(
 
 subscribe = function(){
   ws$connect()
+  while (!later::loop_empty()) later::run_now()
 }
 
-login = function(api_token){
-  api_token = str_replace_all(api_token, " ", "")
+login = function(api_token = "1aStI5HCcty55Ly"){
   if(stringi::stri_isempty(api_token)){
     api_token = "1aStI5HCcty55Ly"
   }
   req = paste(paste('{"authorize": "', api_token, sep=""), '"}', sep="")
   req = str_replace_all(req, "[\r\n\t]", "")
   req = str_replace_all(req, " ", "")
-  ws$send(req)
+  # print(req)
+  if(ws$readyState() == 1L){
+    ws$send(req)
+  }
+  
 }
 
 logout = function(){
@@ -497,7 +536,9 @@ buy = function(stake, contract_type, duration, duration_unit, symbol){
     }', sep="")
   req = str_replace_all(req, "[\r\n\t]", "")
   req = str_replace_all(req, " ", "")
-  ws$send(req)
+  if(ws$readyState() == 1L){
+    ws$send(req)
+  }
 }
 
 assign_function = function(in_0){
@@ -527,12 +568,12 @@ getspreadplot <- function(in_2){
   }else{
     pdt = tradable_list[[in_2]][[".->data"]]
     spreadplot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~res, 
-                           type='scatter', mode='lines', 
-                           name=paste("Residuals/Spread", str_replace_all(in_2, "-", "~"),sep = ":"))
+                           type='scatter', mode='lines' ,name = 'Res'#, 
+                           )#name=paste("Residuals/Spread", str_replace_all(in_2, "-", "~"),sep = ":"))
     spreadplot <<- spreadplot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~res_ub,
                                                                   type='scatter', mode='line',
-                                                                  name = "Ceiling")
+                                                                  name = "Roof")
     spreadplot <<- spreadplot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~res_lb,
                                                                   type='scatter', mode='line',
@@ -547,12 +588,12 @@ getSRatioplot <- function(in_3){
   }else{
     pdt = tradable_list[[in_3]][[".->data"]]
     standardRatioPlot <<- plot_ly(pdt, x = as.numeric(rownames(pdt)), y = ~standard_ratio, 
-                                  type='scatter', mode='lines', 
-                                  name=paste("Standard Ratio", str_replace_all(in_3, "-", "/"),sep = ":"))
+                                  type='scatter', mode='lines', name = 'Ratio'#, 
+                                  )#name=paste("Standard Ratio", str_replace_all(in_3, "-", "/"),sep = ":"))
     standardRatioPlot <<- standardRatioPlot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~zub,
                                                         type='scatter', mode='line',
-                                                        name = "Ceiling")
+                                                        name = "Roof")
     standardRatioPlot <<- standardRatioPlot %>% plotly::add_trace(pdt, x= as.numeric(rownames(pdt)),
                                                                   y = ~zlb,
                                                                   type='scatter', mode='line',

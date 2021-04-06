@@ -60,9 +60,9 @@ pairs_menu_item2 <- fluidRow(
         # title = "First tabBox",
         # The id lets us use input$tabset1 on the server to find the current tab
         id = "tabset1", width="100%",
-        tabPanel("Pairwise Plot", plotlyOutput("dpairsPlot")),
-        tabPanel("Spread/Residuals", plotlyOutput("resPlot")),
-        tabPanel("Ratios", plotlyOutput("ratioPlot"))
+        tabPanel("Pairwise Plot", textOutput("txt1"), plotlyOutput("dpairsPlot")),
+        tabPanel("Spread/Residuals", textOutput("txt2"), plotlyOutput("resPlot")),
+        tabPanel("Ratios", textOutput("txt3"), plotlyOutput("ratioPlot"))
     )  
     
 )
